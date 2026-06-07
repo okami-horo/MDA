@@ -147,90 +147,19 @@ func GetMembershipStatus() *MembershipStatus {
 
 // checkMembership performs the full membership check flow.
 func checkMembership() *MembershipStatus {
-	if isDebugEnvironment() {
-		log.Info().
-			Str("version", appVersion).
-			Str("client_name", clientName).
-			Msg("Debug environment detected, bypassing membership verification")
-		return &MembershipStatus{
-			Tier:                "Debug",
-			TierCode:            "debug",
-			TierName:            "Debug",
-			PlanCode:            "debug",
-			PlanName:            "Debug",
-			StartsOn:            "00000000",
-			ExpiresOn:           "99991231",
-			RemainingDays:       9999,
-			AllFeaturesUnlocked: true,
-			UnlimitedRuntime:    true,
-			IsMember:            true,
-		}
+	return &MembershipStatus{
+		Tier:                "Local",
+		TierCode:            "local",
+		TierName:            "Local",
+		PlanCode:            "local",
+		PlanName:            "Local",
+		StartsOn:            "00000000",
+		ExpiresOn:           "99991231",
+		RemainingDays:       9999,
+		AllFeaturesUnlocked: true,
+		UnlimitedRuntime:    true,
+		IsMember:            true,
 	}
-
-	deviceCode := GenerateDeviceCodeV7()
-	cachedDeviceCode = deviceCode
-
-	defaultStatus := &MembershipStatus{
-		Tier:                        "Orange Free",
-		TierCode:                    "orange_free",
-		TierName:                    "Orange Free",
-		PlanName:                    "Orange Free",
-		DailyRuntimeMinutes:         10,
-		RegularDailyRuntimeMinutes:  10,
-		SpecialPeriodRuntimeMinutes: 0,
-		AllFeaturesUnlocked:         true,
-		IsMember:                    false,
-		DeviceCode:                  deviceCode,
-	}
-
-	log.Info().
-		Str("cpu_hash", shortHash(deviceCode.CPUHash)).
-		Str("uuid_hash", shortHash(deviceCode.UUIDHash)).
-		Msg("Generated V7 device code")
-
-	response, err := fetchMemberStatus(deviceCode)
-	if err != nil {
-		var updateErr *updateRequiredError
-		if errors.As(err, &updateErr) {
-			status := &MembershipStatus{
-				Tier:                        defaultStatus.Tier,
-				TierCode:                    defaultStatus.TierCode,
-				TierName:                    defaultStatus.TierName,
-				PlanName:                    defaultStatus.PlanName,
-				DailyRuntimeMinutes:         defaultStatus.DailyRuntimeMinutes,
-				RegularDailyRuntimeMinutes:  defaultStatus.RegularDailyRuntimeMinutes,
-				SpecialPeriodRuntimeMinutes: defaultStatus.SpecialPeriodRuntimeMinutes,
-				AllFeaturesUnlocked:         defaultStatus.AllFeaturesUnlocked,
-				UpdateRequired:              true,
-				UpdateMessage:               updateErr.Message,
-				MinimumSupportedVersion:     updateErr.MinimumSupportedVersion,
-				DeviceCode:                  deviceCode,
-			}
-			cacheStatus(status)
-			return status
-		}
-		log.Warn().Err(err).Msg("Membership verification unavailable, treating as non-member for this check")
-		return defaultStatus
-	}
-
-	if !response.Matched {
-		log.Info().Int("score", response.Score).Msg("No matching member device found, using Orange Free quota")
-		return defaultStatus
-	}
-
-	status := statusFromResponse(response, deviceCode)
-	log.Info().
-		Str("user_id", status.UserID).
-		Int("score", response.Score).
-		Str("tier", status.Tier).
-		Str("plan_code", status.PlanCode).
-		Str("plan_name", status.PlanName).
-		Str("expiry", status.ExpiresOn).
-		Int("remaining_days", status.RemainingDays).
-		Msg("Matched active member subscription")
-
-	cacheStatus(status)
-	return status
 }
 
 func cacheStatus(status *MembershipStatus) {
