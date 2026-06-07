@@ -477,7 +477,11 @@ Temporary Items
 
 # python
 venv/
+.venv/
 .cache/
+
+# local Go workspace
+.go/
 
 # maa-tools
 tests/maatools
