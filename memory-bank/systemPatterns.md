@@ -49,10 +49,10 @@ MDA follows the **MaaFramework + Project Interface + MXU** stack:
 
 ## Critical Implementation Paths
 1. **Task Start**: MXU reads `interface.json` → user selects task + options → MXU generates `pipeline_override` → MaaFramework loads pipeline JSON + override → Tasker executes from `<Domain>Main` entry node.
-2. **Quota Enforcement**: Go agent `membership` sink reads device code → queries/refills quota → allows or blocks task start based on remaining daily minutes.
+2. ~~**Quota Enforcement**: Go agent `membership` sink reads device code → queries/refills quota → allows or blocks task start based on remaining daily minutes.~~ **(Disabled 2026-06-07)**: `checkMembership()` now returns a fixed local unlimited status; device-code generation, HTTP quota fetch, and refill logic are preserved but inactive.
 3. **Environment Guardrails**: `aspectratio`, `hdrcheck`, `processcheck` sinks run before or alongside tasks to warn about unsupported configurations.
 
 ## Data Flow
 - User config (task selection + option toggles) flows **down** from MXU to MaaFramework as JSON overrides.
 - Run logs (`maafw.log`, `go-service.log`, `mxu-*.log`) flow **up** from the backend to the user for debugging.
-- Quota state flows **out** from the Go agent to a remote endpoint and **back** into the run log for user visibility.
+- ~~Quota state flows **out** from the Go agent to a remote endpoint and **back** into the run log for user visibility.~~ **(Disabled 2026-06-07)**

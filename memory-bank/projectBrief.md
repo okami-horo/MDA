@@ -7,7 +7,7 @@ MDA (Maa Doro Assistant) is a game automation assistant for the mobile game **NI
 - Automate daily and periodic in-game tasks for NIKKE players.
 - Provide a stable, user-friendly automation experience via MXU frontend + MaaFramework backend.
 - Support both Win32 window capture and ADB controllers.
-- Maintain a membership-based daily runtime quota system to sustain full-time development.
+- ~~Maintain a membership-based daily runtime quota system to sustain full-time development.~~ **(Removed 2026-06-07)**
 
 ## Requirements
 - Windows OS (PowerShell 7).
@@ -19,7 +19,7 @@ MDA (Maa Doro Assistant) is a game automation assistant for the mobile game **NI
 - **Windows-only** — no Linux/macOS support.
 - **PowerShell 7** for all terminal / build / dev commands.
 - Game UI language locked to Simplified Chinese for recognition accuracy.
-- Daily runtime quota enforced by Go agent (free tier: 10 min/day, resets at 04:00).
+- ~~Daily runtime quota enforced by Go agent (free tier: 10 min/day, resets at 04:00).~~ **(Removed 2026-06-07)**: Remote membership verification bypassed; all local users default to unlimited runtime.
 - Interface localization limited to `zh_cn` and `en_us`.
 
 ## Success Criteria

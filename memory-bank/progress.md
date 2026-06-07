@@ -21,14 +21,15 @@
 - Continuous locale synchronization when adding tasks/options.
 
 ## Current Status
-Stable, actively maintained. Memory bank initialized to improve cross-session agent context.
+Stable, actively maintained. Remote membership verification disabled on `develop` branch; all users now run with unlimited runtime. Memory bank initialized to improve cross-session agent context.
 
 ## Known Issues
 - Script recognition is **CN-only**; non-Chinese game clients will fail.
 - Debug image generation can consume significant disk space if left on for long runs.
-- Free tier limited to 10 minutes/day (by design, not a bug).
+- ~~Free tier limited to 10 minutes/day (by design, not a bug).~~ **Removed**: remote membership verification bypassed; all local users default to unlimited runtime.
 
 ## Evolution of Decisions
 - Originally `DoroHelper`; rewritten as MDA on MaaFramework for better maintainability.
 - Membership model shifted from gating specific tasks to a unified daily runtime quota.
 - Node naming moved away from `FlagInX` style to explicit `On...Page` / `Visible` / `Entered` semantics.
+- **2026-06-07**: Remote membership verification bypassed entirely. `checkMembership()` short-circuits to local unlimited status. Quota enforcement code preserved in repo but no longer active.
