@@ -30,6 +30,8 @@
             "[JumpBack]RedDotClearProfilePage",
             "[JumpBack]RedDotClearArchives",
             "[JumpBack]RedDotClearCostumeGacha",
+            "[JumpBack]RedDotClearRhythmGame",
+            "[JumpBack]RedDotClearBlaBla",
             "CommonEndTask"
         ]
     }
