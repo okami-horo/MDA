@@ -6,11 +6,10 @@ NIKKE players face repetitive daily chores (missions, arena, shops, events, etc.
 ## Target Users
 - NIKKE players on Windows who want to automate routine gameplay.
 - Users comfortable with a Chinese game interface.
-- Free users (limited daily runtime) and sponsoring members (higher daily quotas).
+- Local users running the fork build who want unlimited runtime without account login.
 
 ## User Experience Goals
 - One-click task execution from a clean MXU-based GUI.
-- Transparent quota display in run logs.
 - Easy issue reporting via built-in log export + debug image capture.
 - Global hotkey support to force-quit if the automation hangs.
 
@@ -31,10 +30,10 @@ NIKKE players face repetitive daily chores (missions, arena, shops, events, etc.
 | Solo Raid | Solo raid automation |
 | Coordinated Operations | Co-op battle automation |
 | Presets | DailyFull, QuickDaily, SelfUse combined task presets |
-| Go Agent Sinks | Aspect-ratio check, HDR check, process check, membership/quota system |
+| Go Agent Sinks | Aspect-ratio check, HDR check, process check, membership/quota bypass |
 
 ## Value Proposition
 - Full-time maintenance guarantees timely adaptation to game updates.
 - MaaFramework provides reliable computer-vision-driven UI automation rather than brittle coordinate clicking.
 - Modular pipeline + Project Interface architecture makes adding new tasks straightforward.
-- Membership model sustains development while keeping all features accessible to free users.
+- This fork removes remote membership verification so all local users have unlimited runtime without login.

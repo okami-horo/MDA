@@ -23,12 +23,13 @@ MDA follows the **MaaFramework + Project Interface + MXU** stack:
 │  - Custom recognizers / actions     │
 │  - Environment checks (HDR, ratio)  │
 │  - Membership / quota logic         │
+│    (bypassed in this fork)          │
 └─────────────────────────────────────┘
 ```
 
 ## Key Technical Decisions
 - **Project Interface v2** for declarative task/option modeling.
-- **Go Agent** for logic that is awkward to express in pure Pipeline JSON (quota math, external HTTP calls, Windows API checks).
+- **Go Agent** for logic that is awkward to express in pure Pipeline JSON (membership bypass, Windows API checks).
 - **Win32 Background Capture** as the default recommended controller (`Background` + `SendMessageWithCursorPos`).
 - **PascalCase node naming** with strict domain + role suffix conventions (see `docs/pipeline-node-naming.md`).
 
@@ -44,7 +45,7 @@ MDA follows the **MaaFramework + Project Interface + MXU** stack:
 | `assets/interface.json` | `tasks/*.json` imports | Runtime PI config |
 | `assets/tasks/*.json` | locale keys, pipeline node names | Task + option schema for MXU |
 | `assets/resource/pipeline/**/*.json` | template images | Executable node graph for MaaFramework |
-| `agent/go-service` | PI env, resource reader | Custom actions/recognizers, quota enforcement |
+| `agent/go-service` | PI env, resource reader | Custom actions/recognizers, membership/quota bypass |
 | `assets/locales/interface/*.json` | task/option/controller keys | User-facing UI text |
 
 ## Critical Implementation Paths

@@ -1,7 +1,9 @@
 # Project Brief
 
 ## Overview
-MDA (Maa Doro Assistant) is a game automation assistant for the mobile game **NIKKE / 勝利女神：妮姬** (Goddess of Victory: Nikke), built on top of [MaaFramework](https://github.com/MaaXYZ/MaaFramework). It was rewritten from the earlier project [DoroHelper](https://github.com/1204244136/DoroHelper). The project targets **Windows only** and is maintained full-time by the original author.
+MDA (Maa Doro Assistant) is a game automation assistant for the mobile game **NIKKE / 勝利女神：妮姬** (Goddess of Victory: Nikke), built on top of [MaaFramework](https://github.com/MaaXYZ/MaaFramework). It was rewritten from the earlier project [DoroHelper](https://github.com/1204244136/DoroHelper).
+
+This repository is a fork of [1204244136/MDA](https://github.com/1204244136/MDA). The fork removes the upstream membership / account-login verification and sets all local users to unlimited runtime. The project targets **Windows only**.
 
 ## Goals
 - Automate daily and periodic in-game tasks for NIKKE players.

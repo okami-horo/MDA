@@ -9,7 +9,7 @@
   - `aspectratio` — display aspect ratio validation
   - `hdrcheck` — Windows HDR state detection
   - `processcheck` — NIKKE process validation
-  - `membership` — quota / device-code / refill logic
+  - `membership` — quota / device-code / refill logic (bypassed in this fork; local unlimited)
 - Localization for `zh_cn` and `en_us`.
 - Comprehensive pipeline naming conventions documented in `docs/pipeline-node-naming.md`.
 - Issue log analysis skill set up for debugging.
