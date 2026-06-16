@@ -4,7 +4,8 @@
 Membership system refactored to bypass remote verification; local users now default to unlimited runtime.
 
 ## Recent Events
-- 2026-06-12: Audit upstream source project; `upstream/main` is at v1.6.2 with 46 new commits ahead of local `develop`. Memory Bank refined to clarify fork purpose and remove leftover membership/quota language.
+- 2026-06-13: Sync `upstream/main` updates up to `ec4ed53` into `develop`, including ArkRanger mini-game option, activity-option switches, preset cleanup, and project refactor. Push `v3.0.2` release; CI passes for all platforms.
+- 2026-06-12: Merge `upstream/main` v1.6.2 into `develop`; preserve local membership bypass and Memory Bank. Push `v3.0.1` release; CI passes for all platforms.
 - 2026-06-07: Refactor membership `checkMembership()` to return local unlimited status without network calls or device-code generation.
 - 2025-06-06: Initialize Memory Bank with 7 core files based on existing codebase analysis.
 

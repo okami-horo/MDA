@@ -45,7 +45,7 @@ MDA follows the **MaaFramework + Project Interface + MXU** stack:
 | `assets/interface.json` | `tasks/*.json` imports | Runtime PI config |
 | `assets/tasks/*.json` | locale keys, pipeline node names | Task + option schema for MXU |
 | `assets/resource/pipeline/**/*.json` | template images | Executable node graph for MaaFramework |
-| `agent/go-service` | PI env, resource reader | Custom actions/recognizers, membership/quota bypass |
+| `agent/go-service` | PI env, resource reader | Custom actions/recognizers, membership/quota bypass, center-priority recognizer |
 | `assets/locales/interface/*.json` | task/option/controller keys | User-facing UI text |
 
 ## Critical Implementation Paths

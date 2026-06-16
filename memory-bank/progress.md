@@ -19,6 +19,7 @@
 - Potential new task domains as game content expands.
 - Go agent sink expansion if new environmental checks are needed.
 - Continuous locale synchronization when adding tasks/options.
+- Update project docs and Memory Bank when upstream adds significant features.
 
 ## Current Status
 Stable, actively maintained. Remote membership verification disabled on `develop` branch; all users now run with unlimited runtime. Memory bank initialized to improve cross-session agent context.

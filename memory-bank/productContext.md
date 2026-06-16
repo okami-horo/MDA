@@ -23,14 +23,14 @@ NIKKE players face repetitive daily chores (missions, arena, shops, events, etc.
 | Shop | Arena shop, common shop, recycling shop, cash shop |
 | Simulation Room | Overclock and BIOS auto-setting |
 | Tribe Tower | Common / individual corporate towers |
-| Events | Small events and large events (story, mission, challenge, login stamp) |
+| Events | Small events and large events (story, mission, challenge, login stamp); large-event theme selector supports **ARK RANGER** and **StarAnis** |
 | Map Pushing | Auto stage progression |
-| Red Dot Clear | Sub-menu, cash shop, costume gacha, notice, profile, archives |
-| Account Nurturing | Synchro device and other nurturing flows |
+| Red Dot Clear | Sub-menu, cash shop, costume gacha, notice, profile, archives, BlaBla, Rhythm Game |
+| Account Nurturing | Synchro device enhancement, cube enhancement, recycle-room upgrade |
 | Solo Raid | Solo raid automation |
 | Coordinated Operations | Co-op battle automation |
 | Presets | DailyFull, QuickDaily, SelfUse combined task presets |
-| Go Agent Sinks | Aspect-ratio check, HDR check, process check, membership/quota bypass |
+| Go Agent Sinks | Aspect-ratio check, HDR check, process check, membership/quota bypass, center-priority recognizer |
 
 ## Value Proposition
 - Full-time maintenance guarantees timely adaptation to game updates.

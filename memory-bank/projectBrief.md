@@ -9,7 +9,7 @@ This repository is a fork of [1204244136/MDA](https://github.com/1204244136/MDA)
 - Automate daily and periodic in-game tasks for NIKKE players.
 - Provide a stable, user-friendly automation experience via MXU frontend + MaaFramework backend.
 - Support both Win32 window capture and ADB controllers.
-- ~~Maintain a membership-based daily runtime quota system to sustain full-time development.~~ **(Removed 2026-06-07)**
+- Continuously sync upstream improvements while preserving local fork modifications (membership bypass, Memory Bank, CI fixes).
 
 ## Requirements
 - Windows OS (PowerShell 7).
