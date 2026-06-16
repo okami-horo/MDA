@@ -12,6 +12,7 @@ Membership system refactored to bypass remote verification; local users now defa
 
 ## Active Decisions
 - **No remote membership verification**: `checkMembership()` now short-circuits to a fixed `UnlimitedRuntime: true` status. Existing quota/refill/device-code code remains in repo but is effectively unreachable in normal flow.
+- **Membership bypass is non-negotiable**: Disabling remote membership verification is the primary purpose of this fork. Any upstream sync, merge, or refactor must preserve the bypass in `agent/go-service/taskersink/membership/memberdata.go`. If upstream changes threaten this, the local bypass wins.
 - **develop branch**: Active feature branch created from `main` for this refactor.
 
 ## Blockers

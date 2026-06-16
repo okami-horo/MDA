@@ -3,13 +3,14 @@
 ## Overview
 MDA (Maa Doro Assistant) is a game automation assistant for the mobile game **NIKKE / 勝利女神：妮姬** (Goddess of Victory: Nikke), built on top of [MaaFramework](https://github.com/MaaXYZ/MaaFramework). It was rewritten from the earlier project [DoroHelper](https://github.com/1204244136/DoroHelper).
 
-This repository is a fork of [1204244136/MDA](https://github.com/1204244136/MDA). The fork removes the upstream membership / account-login verification and sets all local users to unlimited runtime. The project targets **Windows only**.
+This repository is a fork of [1204244136/MDA](https://github.com/1204244136/MDA). **The primary purpose of this fork is to disable the upstream remote membership / account-login verification and ensure all local users have unlimited runtime.** This goal takes precedence over all other maintenance work, including upstream synchronization. The project targets **Windows only**.
 
 ## Goals
 - Automate daily and periodic in-game tasks for NIKKE players.
 - Provide a stable, user-friendly automation experience via MXU frontend + MaaFramework backend.
 - Support both Win32 window capture and ADB controllers.
 - Continuously sync upstream improvements while preserving local fork modifications (membership bypass, Memory Bank, CI fixes).
+- **Never re-enable remote membership verification during any upstream merge or refactor.**
 
 ## Requirements
 - Windows OS (PowerShell 7).
@@ -25,7 +26,9 @@ This repository is a fork of [1204244136/MDA](https://github.com/1204244136/MDA)
 - Interface localization limited to `zh_cn` and `en_us`.
 
 ## Success Criteria
+- **Remote membership verification remains disabled in every build and every branch; `checkMembership()` must return local unlimited status.**
 - All tasks complete successfully on standard NIKKE UI flows.
 - Pipeline nodes follow the project's PascalCase naming conventions and domain boundaries.
 - Go agent compiles and registers all custom sinks correctly.
 - locale keys stay synchronized across `zh_cn` and `en_us`.
+- Every upstream sync ends with a diff review confirming `agent/go-service/taskersink/membership/memberdata.go` still bypasses verification.

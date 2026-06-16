@@ -30,6 +30,7 @@ MDA follows the **MaaFramework + Project Interface + MXU** stack:
 ## Key Technical Decisions
 - **Project Interface v2** for declarative task/option modeling.
 - **Go Agent** for logic that is awkward to express in pure Pipeline JSON (membership bypass, Windows API checks).
+- **Membership bypass is the highest-priority fork constraint**: `checkMembership()` must always return a local unlimited status; upstream membership logic must not be allowed to re-enable remote verification.
 - **Win32 Background Capture** as the default recommended controller (`Background` + `SendMessageWithCursorPos`).
 - **PascalCase node naming** with strict domain + role suffix conventions (see `docs/pipeline-node-naming.md`).
 
