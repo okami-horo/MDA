@@ -4,6 +4,7 @@
 Membership system refactored to bypass remote verification; local users now default to unlimited runtime.
 
 ## Recent Events
+- 2026-06-16: Sync `upstream/main` updates up to `94f2fe9` (v1.6.5) into `develop`: activity region popup/text fixes, mini-game return flow, arena cumulative reward click limit, free-state confirmation, cash-shop collection, battle entry text, badge sticker offset, and locale/preset cleanup. Preserve local membership bypass, Memory Bank, and CI guards.
 - 2026-06-13: Sync `upstream/main` updates up to `ec4ed53` into `develop`, including ArkRanger mini-game option, activity-option switches, preset cleanup, and project refactor. Push `v3.0.2` release; CI passes for all platforms.
 - 2026-06-12: Merge `upstream/main` v1.6.2 into `develop`; preserve local membership bypass and Memory Bank. Push `v3.0.1` release; CI passes for all platforms.
 - 2026-06-07: Refactor membership `checkMembership()` to return local unlimited status without network calls or device-code generation.
