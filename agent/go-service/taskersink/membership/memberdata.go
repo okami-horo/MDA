@@ -116,6 +116,7 @@ type MembershipStatus struct {
 	AllFeaturesUnlocked         bool
 	UnlimitedRuntime            bool
 	IsMember                    bool
+	VerificationUnavailable     bool
 	UpdateRequired              bool
 	UpdateMessage               string
 	MinimumSupportedVersion     string

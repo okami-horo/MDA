@@ -22,7 +22,7 @@
 - Update project docs and Memory Bank when upstream adds significant features.
 
 ## Current Status
-Stable, actively maintained. Remote membership verification disabled on `develop` branch; all users now run with unlimited runtime. **Preserving the membership bypass is the top priority for every future change, including upstream merges.** Memory bank initialized to improve cross-session agent context. Latest `upstream/main` (v1.6.5, up to `94f2fe9`) has been merged into `develop` while preserving fork-specific bypass, Memory Bank, and CI guards.
+Stable, actively maintained. Remote membership verification disabled on `develop` branch; all users now run with unlimited runtime. **Preserving the membership bypass is the top priority for every future change, including upstream merges.** Memory bank initialized to improve cross-session agent context. Latest `upstream/main` (v1.7.1, up to `638383b`) has been merged into `develop` while preserving fork-specific bypass, Memory Bank, and CI guards.
 
 ## Known Issues
 - Script recognition is **CN-only**; non-Chinese game clients will fail.
