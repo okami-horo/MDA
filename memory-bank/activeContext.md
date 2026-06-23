@@ -4,6 +4,7 @@
 Membership system refactored to bypass remote verification; local users now default to unlimited runtime.
 
 ## Recent Events
+- 2026-06-23: Merge `upstream/HEAD` / `upstream/main` update `1527a10` into `develop`: adjust advise recognition expected content. Preserve local membership bypass in `agent/go-service/taskersink/membership/memberdata.go`.
 - 2026-06-20: Merge `upstream/HEAD` / `upstream/main` updates up to `638383b` (v1.7.1) into `develop`: lucky-box opening task, arcade red-dot clearing, membership verification unavailable handling, battle/event/account-nurturing fixes, and image/template updates. Preserve local membership bypass in `agent/go-service/taskersink/membership/memberdata.go`.
 - 2026-06-16: Sync `upstream/main` updates up to `94f2fe9` (v1.6.5) into `develop`: activity region popup/text fixes, mini-game return flow, arena cumulative reward click limit, free-state confirmation, cash-shop collection, battle entry text, badge sticker offset, and locale/preset cleanup. Preserve local membership bypass, Memory Bank, and CI guards.
 - 2026-06-13: Sync `upstream/main` updates up to `ec4ed53` into `develop`, including ArkRanger mini-game option, activity-option switches, preset cleanup, and project refactor. Push `v3.0.2` release; CI passes for all platforms.

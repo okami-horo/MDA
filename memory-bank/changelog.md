@@ -8,6 +8,7 @@ All notable changes, decisions, and versions for this project.
 - Sync upstream lucky-box opening task and arcade red-dot clearing support into `develop`.
 
 ### Changed
+- **2026-06-23**: Sync latest `upstream/main` update `1527a10` into `develop`: adjust advise recognition expected content. Preserve local membership bypass, Memory Bank, and CI guards.
 - **2026-06-20**: Sync latest `upstream/main` updates (up to `638383b`, v1.7.1) into `develop`: lucky-box opening task, arcade red-dot clearing, membership verification unavailable handling, battle/event/account-nurturing fixes, and image/template updates. Preserve local membership bypass, Memory Bank, and CI guards.
 
 ## [3.0.3] - 2026-06-16
