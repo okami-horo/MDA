@@ -280,12 +280,13 @@
                     30
                 ],
                 "expected": [
-                    "3"
+                    "[2-9]"
                 ]
             }
         },
         "next": [
-            "ArkRangerMiniGameClickPause"
+            "ArkRangerMiniGameClickPause",
+            "ArkRangerMiniGameClickBattleBegin" //兜底
         ]
     },
     "ArkRangerMiniGameClickPause": {
@@ -317,7 +318,8 @@
         },
         "next": [
             "ArkRangerMiniGameClickQuickComplete",
-            "ArkRangerMiniGameBattleFlow" //兜底
+            "ArkRangerMiniGameBattleFlow", //兜底
+            "[JumpBack]ArkRangerMiniGameCheckFeature" //兜底
         ]
     },
     "ArkRangerMiniGameClickQuickComplete": {
