@@ -137,6 +137,11 @@ const (
 	maxFetchAttempts = 3
 )
 
+var (
+	generateDeviceCodeV7 = GenerateDeviceCodeV7
+	fetchMemberStatusFn  = fetchMemberStatus
+)
+
 // GetMembershipStatus returns the current membership status, using cache if available.
 func GetMembershipStatus() *MembershipStatus {
 	cachedStatusMu.RLock()
