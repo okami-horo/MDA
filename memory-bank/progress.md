@@ -34,3 +34,4 @@ Stable, actively maintained. Remote membership verification disabled on `develop
 - Membership model shifted from gating specific tasks to a unified daily runtime quota.
 - Node naming moved away from `FlagInX` style to explicit `On...Page` / `Visible` / `Entered` semantics.
 - **2026-06-07**: Remote membership verification bypassed entirely. `checkMembership()` short-circuits to local unlimited status. Quota enforcement code preserved in repo but no longer active.
+- **2026-07-11**: Runtime log `task_id=200000137` confirmed that quick-battle OCR succeeded, but `QuickBattleAvailable` detected 98 near-white pixels against a threshold of 100, causing fallback to normal battle. Lowered `assets/resource/pipeline/Battle/Battle.json` `QuickBattleAvailable.count` to 80 and passed Pipeline/Interface schema validation; real-game validation of both available and unavailable quick-battle states remains pending.
