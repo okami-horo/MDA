@@ -280,6 +280,61 @@ func TestQuotaChecksFailClosedForMalformedState(t *testing.T) {
 	}
 }
 
+func TestUnlimitedRuntimeRouteCheckIgnoresMalformedState(t *testing.T) {
+	path := isolateQuotaState(t)
+	malformedState := []byte(`{"version":`)
+	if err := os.WriteFile(path, malformedState, 0644); err != nil {
+		t.Fatalf("WriteFile() failed: %v", err)
+	}
+	status := testStatus(10, "device-a")
+	status.UnlimitedRuntime = true
+	status.IsMember = true
+
+	snapshot, ok, err := EnsureQuotaRouteAvailable(status, quotaRouteRegular)
+	if err != nil {
+		t.Fatalf("EnsureQuotaRouteAvailable() failed: %v", err)
+	}
+	if !ok {
+		t.Fatal("EnsureQuotaRouteAvailable() rejected unlimited runtime")
+	}
+	if !snapshot.UnlimitedRuntime {
+		t.Fatal("UnlimitedRuntime = false, want true")
+	}
+	got, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile() failed: %v", err)
+	}
+	if string(got) != string(malformedState) {
+		t.Fatal("unlimited runtime route check modified quota state")
+	}
+}
+
+func TestUnlimitedRuntimeUsageIgnoresMalformedState(t *testing.T) {
+	path := isolateQuotaState(t)
+	malformedState := []byte(`{"version":`)
+	if err := os.WriteFile(path, malformedState, 0644); err != nil {
+		t.Fatalf("WriteFile() failed: %v", err)
+	}
+	status := testStatus(10, "device-a")
+	status.UnlimitedRuntime = true
+	status.IsMember = true
+
+	snapshot, err := AddQuotaRouteUsageSeconds(status, quotaRouteRegular, 60)
+	if err != nil {
+		t.Fatalf("AddQuotaRouteUsageSeconds() failed: %v", err)
+	}
+	if !snapshot.UnlimitedRuntime {
+		t.Fatal("UnlimitedRuntime = false, want true")
+	}
+	got, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile() failed: %v", err)
+	}
+	if string(got) != string(malformedState) {
+		t.Fatal("unlimited runtime usage modified quota state")
+	}
+}
+
 func TestLimitedMemberCarriesDebt(t *testing.T) {
 	path := isolateQuotaState(t)
 	status := testStatus(60, "device-a")

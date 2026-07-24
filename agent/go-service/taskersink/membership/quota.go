@@ -589,6 +589,11 @@ func EnsureQuotaAvailable(status *MembershipStatus, pool quotaPool) (QuotaSnapsh
 }
 
 func EnsureQuotaRouteAvailable(status *MembershipStatus, route quotaRoute) (QuotaSnapshot, bool, error) {
+	if status.UnlimitedRuntime {
+		snapshot := routeSnapshotFromState(status, quotaState{Pools: map[string]quotaPoolState{}}, route)
+		return snapshot, true, nil
+	}
+
 	quotaMu.Lock()
 	defer quotaMu.Unlock()
 	unlock, err := lockQuotaStateFile()
@@ -629,6 +634,11 @@ func AddQuotaRouteUsageSeconds(status *MembershipStatus, route quotaRoute, secon
 }
 
 func addQuotaRouteUsageSeconds(status *MembershipStatus, route quotaRoute, seconds int64) (QuotaSnapshot, bool, error) {
+	if status.UnlimitedRuntime {
+		snapshot := routeSnapshotFromState(status, quotaState{Pools: map[string]quotaPoolState{}}, route)
+		return snapshot, false, nil
+	}
+
 	if seconds <= 0 {
 		snapshot, _, err := EnsureQuotaRouteAvailable(status, route)
 		return snapshot, false, err

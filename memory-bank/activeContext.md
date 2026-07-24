@@ -4,6 +4,7 @@
 Membership system refactored to bypass remote verification; local users now default to unlimited runtime.
 
 ## Recent Events
+- 2026-07-24: Merge `upstream/HEAD` / `upstream/main` updates up to `822fa41` (v1.7.22) into `develop`: battle state recognition and auto-control improvements, SoloRaid unopened-stage fallback, large-event page loading wait, recycle-room and collection-box flows, Daily Login UI adaptation, SmallEvent PROJECT MATIS support, archive/red-dot flow fixes, and quota refill/concurrency infrastructure. Preserve local `QuickBattleAvailable.count=80` and the unlimited membership bypass. Add quota entry-point short-circuits so unlimited local users never read or write quota state and cannot be stopped by malformed or unavailable quota files; replace obsolete remote-membership tests with local offline/unlimited regression coverage.
 - 2026-07-16: Merge `upstream/HEAD` / `upstream/main` updates up to `418c364` into `develop`: battle pre/post flow boundary (`BattleEntered` / Boss cutscene / auto-burst split), SoloRaid settlement animation misjudgment fix, large-event hard stage / mission order / mini-game ROI, simulation-room overclock ROI, reward confirmation text, preset daily reward position, user config storage path revert, membership daily reset timezone (Beijing) and startup check coalescing/device-code cache. Conflict: keep local unlimited membership bypass in `memberdata.go`; preserve local `QuickBattleAvailable.count=80`.
 - 2026-07-12: Merge `upstream/HEAD` / `upstream/main` updates up to `ae4aa12` into `develop`: fix large-event reward collection hanging on the lobby page, and sync MaaFramework Project Interface schema updates. Preserve local membership bypass in `agent/go-service/taskersink/membership/memberdata.go`.
 - 2026-07-02: Merge `upstream/HEAD` / `upstream/main` updates up to `3f59e62` (v1.7.8) into `develop`: v1.7.4-v1.7.8 large-event WAVE TO YOU support and mini-game adaptation, large-event mission reward threshold/flow fixes, mold-opening flow optimization, simulation-room overclock recognition region adjustment, ADB resolution limit relaxation, user config storage path adjustment, recycling-shop click delay update, README updates, and related locale/image/pipeline updates. Resolve recycle-room upgrade conflict by preserving the local click-flow orchestration while keeping upstream availability color check. Preserve local membership bypass in `agent/go-service/taskersink/membership/memberdata.go`.
@@ -18,6 +19,7 @@ Membership system refactored to bypass remote verification; local users now defa
 
 ## Active Decisions
 - **No remote membership verification**: `checkMembership()` now short-circuits to a fixed `UnlimitedRuntime: true` status. Existing quota/refill/device-code code remains in repo but is effectively unreachable in normal flow.
+- **No quota-state dependency for unlimited users**: quota route checks and usage accounting return an unlimited snapshot before file locking or quota-state I/O, so malformed or unavailable quota files cannot stop local users.
 - **Membership bypass is non-negotiable**: Disabling remote membership verification is the primary purpose of this fork. Any upstream sync, merge, or refactor must preserve the bypass in `agent/go-service/taskersink/membership/memberdata.go`. If upstream changes threaten this, the local bypass wins.
 - **develop branch**: Active feature branch created from `main` for this refactor.
 
@@ -25,6 +27,6 @@ Membership system refactored to bypass remote verification; local users now defa
 - None.
 
 ## Next Steps
-1. Monitor for any side effects from bypassing quota enforcement (e.g., unexpected `membership-quota.json` writes).
+1. Monitor future upstream quota changes for new call paths that could bypass the unlimited-user I/O short-circuits.
 2. If needed later, clean up unreachable code (device-code generation, HTTP fetch, refill logic, tests).
 3. Keep memory bank in sync with future feature additions or refactors.

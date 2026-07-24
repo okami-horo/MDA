@@ -1,7 +1,6 @@
 package membership
 
 import (
-	"errors"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -87,132 +86,82 @@ func TestStatusFromResponseFallsBackToTierSpecialQuota(t *testing.T) {
 	}
 }
 
-func TestCheckMembershipUnavailableFallsBackToFreeStatus(t *testing.T) {
+func TestCheckMembershipReturnsLocalUnlimitedStatusWithoutRemoteCalls(t *testing.T) {
 	resetMembershipTestGlobals(t)
 	appVersion = "1.0.0"
 	clientName = "MFAWPF"
+
+	var deviceCodeCalls atomic.Int32
+	var fetchCalls atomic.Int32
 	generateDeviceCodeV7 = func() DeviceCodeV7 {
+		deviceCodeCalls.Add(1)
 		return DeviceCodeV7{CPUHash: "cpu-hash"}
 	}
 	fetchMemberStatusFn = func(DeviceCodeV7) (*MemberStatusResponse, error) {
-		return nil, errors.New("temporary service failure")
+		fetchCalls.Add(1)
+		return &MemberStatusResponse{}, nil
 	}
 
 	status := checkMembership()
 
-	if !status.VerificationUnavailable {
-		t.Fatalf("VerificationUnavailable = false, want true")
+	if status.TierCode != "local" {
+		t.Fatalf("TierCode = %q, want local", status.TierCode)
 	}
-	if status.UpdateRequired {
-		t.Fatalf("UpdateRequired = true, want false")
+	if !status.UnlimitedRuntime {
+		t.Fatal("UnlimitedRuntime = false, want true")
 	}
-	if status.IsMember {
-		t.Fatalf("IsMember = true, want false")
+	if !status.IsMember {
+		t.Fatal("IsMember = false, want true")
 	}
-	if status.TierCode != "orange_free" {
-		t.Fatalf("TierCode = %q, want orange_free", status.TierCode)
+	if !status.AllFeaturesUnlocked {
+		t.Fatal("AllFeaturesUnlocked = false, want true")
 	}
-	if status.RegularDailyRuntimeMinutes != 10 {
-		t.Fatalf("RegularDailyRuntimeMinutes = %d, want 10", status.RegularDailyRuntimeMinutes)
+	if got := deviceCodeCalls.Load(); got != 0 {
+		t.Fatalf("device code generated %d times, want 0", got)
 	}
-	if status.DeviceCode.CPUHash != "cpu-hash" {
-		t.Fatalf("DeviceCode.CPUHash = %q, want cpu-hash", status.DeviceCode.CPUHash)
+	if got := fetchCalls.Load(); got != 0 {
+		t.Fatalf("membership status fetched %d times, want 0", got)
 	}
 }
 
-func TestGetMembershipStatusCachesUnmatchedFreeStatus(t *testing.T) {
+func TestConcurrentMembershipChecksStayLocalAndOffline(t *testing.T) {
 	resetMembershipTestGlobals(t)
 	appVersion = "1.0.0"
 	clientName = "MFAWPF"
 
-	var deviceCodeCalls int
-	var fetchCalls int
-	generateDeviceCodeV7 = func() DeviceCodeV7 {
-		deviceCodeCalls++
-		return DeviceCodeV7{CPUHash: "cpu-hash"}
-	}
-	fetchMemberStatusFn = func(DeviceCodeV7) (*MemberStatusResponse, error) {
-		fetchCalls++
-		return &MemberStatusResponse{Matched: false, Score: 75}, nil
-	}
-
-	first := GetMembershipStatus()
-	second := GetMembershipStatus()
-
-	if first != second {
-		t.Fatal("GetMembershipStatus() did not return the cached free status")
-	}
-	if deviceCodeCalls != 1 {
-		t.Fatalf("device code generated %d times, want 1", deviceCodeCalls)
-	}
-	if fetchCalls != 1 {
-		t.Fatalf("membership status fetched %d times, want 1", fetchCalls)
-	}
-}
-
-func TestGetMembershipStatusReusesDeviceCodeAfterStatusExpiry(t *testing.T) {
-	resetMembershipTestGlobals(t)
-	appVersion = "1.0.0"
-	clientName = "MFAWPF"
-
-	var deviceCodeCalls int
-	var fetchCalls int
-	generateDeviceCodeV7 = func() DeviceCodeV7 {
-		deviceCodeCalls++
-		return DeviceCodeV7{CPUHash: "cpu-hash"}
-	}
-	fetchMemberStatusFn = func(DeviceCodeV7) (*MemberStatusResponse, error) {
-		fetchCalls++
-		return &MemberStatusResponse{Matched: false, Score: 75}, nil
-	}
-
-	GetMembershipStatus()
-	cachedStatusMu.Lock()
-	cachedStatusTime = time.Now().Add(-cacheExpiry)
-	cachedStatusMu.Unlock()
-	GetMembershipStatus()
-
-	if deviceCodeCalls != 1 {
-		t.Fatalf("device code generated %d times, want 1", deviceCodeCalls)
-	}
-	if fetchCalls != 2 {
-		t.Fatalf("membership status fetched %d times, want 2", fetchCalls)
-	}
-}
-
-func TestGetMembershipStatusCoalescesConcurrentChecks(t *testing.T) {
-	resetMembershipTestGlobals(t)
-	appVersion = "1.0.0"
-	clientName = "MFAWPF"
-
+	var deviceCodeCalls atomic.Int32
 	var fetchCalls atomic.Int32
 	generateDeviceCodeV7 = func() DeviceCodeV7 {
+		deviceCodeCalls.Add(1)
 		return DeviceCodeV7{CPUHash: "cpu-hash"}
 	}
-	started := make(chan struct{})
-	release := make(chan struct{})
 	fetchMemberStatusFn = func(DeviceCodeV7) (*MemberStatusResponse, error) {
-		if fetchCalls.Add(1) == 1 {
-			close(started)
-		}
-		<-release
-		return &MemberStatusResponse{Matched: false, Score: 75}, nil
+		fetchCalls.Add(1)
+		return &MemberStatusResponse{}, nil
 	}
 
 	const callers = 8
+	statuses := make(chan *MembershipStatus, callers)
 	var wg sync.WaitGroup
 	wg.Add(callers)
 	for range callers {
 		go func() {
 			defer wg.Done()
-			GetMembershipStatus()
+			statuses <- GetMembershipStatus()
 		}()
 	}
-	<-started
-	close(release)
 	wg.Wait()
+	close(statuses)
 
-	if got := fetchCalls.Load(); got != 1 {
-		t.Fatalf("membership status fetched %d times, want 1", got)
+	for status := range statuses {
+		if !status.UnlimitedRuntime || !status.IsMember || !status.AllFeaturesUnlocked {
+			t.Fatalf("membership status is not local unlimited: %+v", status)
+		}
+	}
+	if got := deviceCodeCalls.Load(); got != 0 {
+		t.Fatalf("device code generated %d times, want 0", got)
+	}
+	if got := fetchCalls.Load(); got != 0 {
+		t.Fatalf("membership status fetched %d times, want 0", got)
 	}
 }
