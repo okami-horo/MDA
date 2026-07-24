@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
@@ -15,6 +17,7 @@ type quotaPool string
 type quotaRoute string
 
 const (
+	quotaStateVersion                = 3
 	quotaPoolRegularDaily  quotaPool = "regular_daily"
 	quotaPoolSpecialPeriod quotaPool = "special_period"
 
@@ -30,11 +33,18 @@ type quotaPoolState struct {
 	UpdatedAt          string `json:"updated_at"`
 }
 
+type quotaCouponRedemption struct {
+	RedeemedAt string          `json:"redeemed_at"`
+	RefillType QuotaRefillType `json:"refill_type"`
+	DeviceHash string          `json:"device_hash,omitempty"`
+}
+
 type quotaState struct {
-	Version    int                       `json:"version,omitempty"`
-	DeviceHash string                    `json:"device_hash"`
-	TierCode   string                    `json:"tier_code"`
-	Pools      map[string]quotaPoolState `json:"pools,omitempty"`
+	Version         int                              `json:"version,omitempty"`
+	DeviceHash      string                           `json:"device_hash"`
+	TierCode        string                           `json:"tier_code"`
+	Pools           map[string]quotaPoolState        `json:"pools,omitempty"`
+	RedeemedCoupons map[string]quotaCouponRedemption `json:"redeemed_coupons,omitempty"`
 
 	BusinessDate       string `json:"business_date,omitempty"`
 	LimitSeconds       int64  `json:"limit_seconds,omitempty"`
@@ -83,8 +93,11 @@ func quotaSpecialPeriodKey(status *MembershipStatus) string {
 
 func quotaStatePath() (string, error) {
 	dir, err := os.UserConfigDir()
-	if err != nil || dir == "" {
-		dir = "."
+	if err != nil {
+		return "", fmt.Errorf("resolve user config directory: %w", err)
+	}
+	if dir == "" {
+		return "", errors.New("user config directory is empty")
 	}
 	path := filepath.Join(dir, "MDA", "go-service")
 	if err := os.MkdirAll(path, 0755); err != nil {
@@ -98,16 +111,19 @@ func deviceHash(device DeviceCodeV7) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func loadQuotaState(path string) quotaState {
+func loadQuotaState(path string) (quotaState, error) {
 	data, err := os.ReadFile(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return quotaState{}, nil
+	}
 	if err != nil {
-		return quotaState{}
+		return quotaState{}, fmt.Errorf("read quota state: %w", err)
 	}
 	var state quotaState
 	if err := json.Unmarshal(data, &state); err != nil {
-		return quotaState{}
+		return quotaState{}, fmt.Errorf("parse quota state: %w", err)
 	}
-	return state
+	return state, nil
 }
 
 func saveQuotaState(path string, state quotaState) error {
@@ -115,7 +131,38 @@ func saveQuotaState(path string, state quotaState) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, data, 0644)
+	temp, err := os.CreateTemp(filepath.Dir(path), ".membership-quota-*.tmp")
+	if err != nil {
+		return err
+	}
+	tempPath := temp.Name()
+	defer os.Remove(tempPath)
+	defer temp.Close()
+
+	if err := temp.Chmod(0644); err != nil {
+		return err
+	}
+	if _, err := temp.Write(data); err != nil {
+		return err
+	}
+	if err := temp.Sync(); err != nil {
+		return err
+	}
+	if err := temp.Close(); err != nil {
+		return err
+	}
+	if err := replaceQuotaStateFile(tempPath, path); err != nil {
+		return err
+	}
+	return nil
+}
+
+func lockQuotaStateFile() (func() error, error) {
+	path, err := quotaStatePath()
+	if err != nil {
+		return nil, err
+	}
+	return acquireQuotaFileLock(path + ".lock")
 }
 
 func quotaLimitSeconds(status *MembershipStatus, pool quotaPool) int64 {
@@ -135,6 +182,33 @@ func quotaLimitSeconds(status *MembershipStatus, pool quotaPool) int64 {
 		}
 		return int64(minutes) * 60
 	}
+}
+
+func quotaMaximumUsedSeconds(limit int64, pool quotaPool) int64 {
+	if limit <= 0 {
+		return 0
+	}
+	if pool == quotaPoolRegularDaily {
+		return limit * 2
+	}
+	return limit
+}
+
+func addQuotaPoolUsage(poolState quotaPoolState, pool quotaPool, seconds int64) (quotaPoolState, bool) {
+	if seconds <= 0 {
+		return poolState, false
+	}
+	maximumUsed := quotaMaximumUsedSeconds(poolState.LimitSeconds, pool)
+	if poolState.UsedSeconds >= maximumUsed {
+		poolState.UsedSeconds = maximumUsed
+		return poolState, true
+	}
+	if seconds > maximumUsed-poolState.UsedSeconds {
+		poolState.UsedSeconds = maximumUsed
+		return poolState, true
+	}
+	poolState.UsedSeconds += seconds
+	return poolState, false
 }
 
 func isRuntimeQuotaSubject(status *MembershipStatus) bool {
@@ -192,6 +266,13 @@ func carriedDailyQuotaDebt(previousPeriod string, usedSeconds int64, limitSecond
 	debt := usedSeconds - limit*days
 	if debt < 0 {
 		return 0
+	}
+	maximumDebt := fallbackLimit
+	if maximumDebt <= 0 {
+		maximumDebt = limit
+	}
+	if maximumDebt > 0 && debt > maximumDebt {
+		debt = maximumDebt
 	}
 	return debt
 }
@@ -251,7 +332,10 @@ func normalizeQuotaState(status *MembershipStatus, args ...any) (string, quotaSt
 	if err != nil {
 		return "", quotaState{}, err
 	}
-	state := loadQuotaState(path)
+	state, err := loadQuotaState(path)
+	if err != nil {
+		return "", quotaState{}, err
+	}
 	state = normalizeQuotaStateInMemory(state, status, pool, now)
 	return path, state, nil
 }
@@ -260,20 +344,22 @@ func normalizeQuotaStateInMemory(state quotaState, status *MembershipStatus, poo
 	device := deviceHash(status.DeviceCode)
 	tierCode := normalizeTierCode(status)
 	updatedAt := now.Format(time.RFC3339)
+	redeemedCoupons := state.RedeemedCoupons
 
 	if state.DeviceHash != device || !isRuntimeQuotaSubject(status) {
 		state = quotaState{
-			Version:    2,
-			DeviceHash: device,
-			TierCode:   tierCode,
-			Pools:      map[string]quotaPoolState{},
+			Version:         quotaStateVersion,
+			DeviceHash:      device,
+			TierCode:        tierCode,
+			Pools:           map[string]quotaPoolState{},
+			RedeemedCoupons: redeemedCoupons,
 		}
 	} else {
 		migrateLegacyQuotaState(&state)
 		if state.Pools == nil {
 			state.Pools = map[string]quotaPoolState{}
 		}
-		state.Version = 2
+		state.Version = quotaStateVersion
 		state.DeviceHash = device
 		state.TierCode = tierCode
 	}
@@ -310,6 +396,18 @@ func normalizeQuotaPool(status *MembershipStatus, state *quotaState, pool quotaP
 	if poolState.UsedSeconds < 0 {
 		poolState.UsedSeconds = 0
 	}
+	maximumUsed := quotaMaximumUsedSeconds(limit, pool)
+	if poolState.UsedSeconds > maximumUsed {
+		poolState.UsedSeconds = maximumUsed
+	}
+	if pool == quotaPoolRegularDaily {
+		if poolState.CarriedDebtSeconds < 0 {
+			poolState.CarriedDebtSeconds = 0
+		}
+		if poolState.CarriedDebtSeconds > limit {
+			poolState.CarriedDebtSeconds = limit
+		}
+	}
 	state.Pools[poolKey] = poolState
 	if pool == quotaPoolRegularDaily {
 		state.BusinessDate = poolState.PeriodKey
@@ -328,6 +426,12 @@ func normalizeQuotaPools(status *MembershipStatus, state quotaState, pools []quo
 }
 
 func quotaSnapshotLocked(status *MembershipStatus, pool quotaPool, now time.Time) (QuotaSnapshot, error) {
+	unlock, err := lockQuotaStateFile()
+	if err != nil {
+		return QuotaSnapshot{}, err
+	}
+	defer unlock()
+
 	path, state, err := normalizeQuotaState(status, pool, now)
 	if err != nil {
 		return QuotaSnapshot{}, err
@@ -448,6 +552,12 @@ func AddQuotaUsageSeconds(status *MembershipStatus, pool quotaPool, seconds int6
 	}
 	quotaMu.Lock()
 	defer quotaMu.Unlock()
+	unlock, err := lockQuotaStateFile()
+	if err != nil {
+		return QuotaSnapshot{}, err
+	}
+	defer unlock()
+
 	now := time.Now()
 	path, state, err := normalizeQuotaState(status, pool, now)
 	if err != nil {
@@ -456,10 +566,7 @@ func AddQuotaUsageSeconds(status *MembershipStatus, pool quotaPool, seconds int6
 	if isRuntimeQuotaSubject(status) {
 		poolKey := string(pool)
 		poolState := state.Pools[poolKey]
-		poolState.UsedSeconds += seconds
-		if pool == quotaPoolSpecialPeriod && poolState.UsedSeconds > poolState.LimitSeconds {
-			poolState.UsedSeconds = poolState.LimitSeconds
-		}
+		poolState, _ = addQuotaPoolUsage(poolState, pool, seconds)
 		poolState.UpdatedAt = now.Format(time.RFC3339)
 		state.Pools[poolKey] = poolState
 	}
@@ -473,7 +580,7 @@ func EnsureQuotaAvailable(status *MembershipStatus, pool quotaPool) (QuotaSnapsh
 	snapshot, err := GetQuotaSnapshot(status, pool)
 	if err != nil {
 		fallback := snapshotFromState(status, quotaState{Pools: map[string]quotaPoolState{}}, pool)
-		return fallback, true, err
+		return fallback, false, err
 	}
 	if snapshot.UnlimitedRuntime {
 		return snapshot, true, nil
@@ -484,16 +591,27 @@ func EnsureQuotaAvailable(status *MembershipStatus, pool quotaPool) (QuotaSnapsh
 func EnsureQuotaRouteAvailable(status *MembershipStatus, route quotaRoute) (QuotaSnapshot, bool, error) {
 	quotaMu.Lock()
 	defer quotaMu.Unlock()
+	unlock, err := lockQuotaStateFile()
+	if err != nil {
+		fallback := routeSnapshotFromState(status, quotaState{Pools: map[string]quotaPoolState{}}, route)
+		return fallback, false, err
+	}
+	defer unlock()
+
 	now := time.Now()
 	path, err := quotaStatePath()
 	if err != nil {
 		fallback := routeSnapshotFromState(status, quotaState{Pools: map[string]quotaPoolState{}}, route)
-		return fallback, true, err
+		return fallback, false, err
 	}
-	state := loadQuotaState(path)
+	state, err := loadQuotaState(path)
+	if err != nil {
+		fallback := routeSnapshotFromState(status, quotaState{Pools: map[string]quotaPoolState{}}, route)
+		return fallback, false, err
+	}
 	state = normalizeQuotaPools(status, state, []quotaPool{quotaPoolRegularDaily, quotaPoolSpecialPeriod}, now)
 	if err := saveQuotaState(path, state); err != nil {
-		return QuotaSnapshot{}, true, err
+		return QuotaSnapshot{}, false, err
 	}
 	snapshot := routeSnapshotFromState(status, state, route)
 	if snapshot.UnlimitedRuntime {
@@ -506,19 +624,34 @@ func EnsureQuotaRouteAvailable(status *MembershipStatus, route quotaRoute) (Quot
 }
 
 func AddQuotaRouteUsageSeconds(status *MembershipStatus, route quotaRoute, seconds int64) (QuotaSnapshot, error) {
+	snapshot, _, err := addQuotaRouteUsageSeconds(status, route, seconds)
+	return snapshot, err
+}
+
+func addQuotaRouteUsageSeconds(status *MembershipStatus, route quotaRoute, seconds int64) (QuotaSnapshot, bool, error) {
 	if seconds <= 0 {
 		snapshot, _, err := EnsureQuotaRouteAvailable(status, route)
-		return snapshot, err
+		return snapshot, false, err
 	}
 	quotaMu.Lock()
 	defer quotaMu.Unlock()
+	unlock, err := lockQuotaStateFile()
+	if err != nil {
+		return QuotaSnapshot{}, false, err
+	}
+	defer unlock()
+
 	now := time.Now()
 	path, err := quotaStatePath()
 	if err != nil {
-		return QuotaSnapshot{}, err
+		return QuotaSnapshot{}, false, err
 	}
-	state := loadQuotaState(path)
+	state, err := loadQuotaState(path)
+	if err != nil {
+		return QuotaSnapshot{}, false, err
+	}
 	state = normalizeQuotaPools(status, state, []quotaPool{quotaPoolRegularDaily, quotaPoolSpecialPeriod}, now)
+	overdraftExceeded := false
 	if isRuntimeQuotaSubject(status) {
 		updatedAt := now.Format(time.RFC3339)
 		regularState := state.Pools[string(quotaPoolRegularDaily)]
@@ -541,15 +674,15 @@ func AddQuotaRouteUsageSeconds(status *MembershipStatus, route quotaRoute, secon
 			regularCharge = seconds - specialCharge
 		}
 		if regularCharge > 0 {
-			regularState.UsedSeconds += regularCharge
+			regularState, overdraftExceeded = addQuotaPoolUsage(regularState, quotaPoolRegularDaily, regularCharge)
 			regularState.UpdatedAt = updatedAt
 			state.Pools[string(quotaPoolRegularDaily)] = regularState
 		}
 	}
 	if err := saveQuotaState(path, state); err != nil {
-		return QuotaSnapshot{}, err
+		return QuotaSnapshot{}, false, err
 	}
-	return routeSnapshotFromState(status, state, route), nil
+	return routeSnapshotFromState(status, state, route), overdraftExceeded, nil
 }
 
 func FormatMinutes(seconds int64) int64 {

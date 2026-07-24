@@ -71,7 +71,7 @@ func TestConsumeTickIgnoresStaleGeneration(t *testing.T) {
 		},
 	}
 
-	if _, done := tracker.consumeTick(nil, status, quotaRouteRegular, 1); !done {
+	if _, done := tracker.consumeTick(status, quotaRouteRegular, 1); !done {
 		t.Fatalf("consumeTick() with stale generation should stop")
 	}
 
@@ -81,6 +81,76 @@ func TestConsumeTickIgnoresStaleGeneration(t *testing.T) {
 	}
 	if snapshot.UsedSeconds != 0 {
 		t.Fatalf("UsedSeconds = %d, want 0", snapshot.UsedSeconds)
+	}
+}
+
+func TestConsumeTickTerminatesWhenOverdraftLimitExceeded(t *testing.T) {
+	isolateQuotaState(t)
+	status := testStatus(10, "device-a")
+	if _, exceeded, err := addQuotaRouteUsageSeconds(status, quotaRouteRegular, 1200); err != nil {
+		t.Fatalf("addQuotaRouteUsageSeconds() failed: %v", err)
+	} else if exceeded {
+		t.Fatal("reaching the overdraft limit should not report it exceeded")
+	}
+
+	postStopCalls := 0
+	tracker := &RuntimeTracker{
+		active:     true,
+		generation: 3,
+		last:       time.Now().Add(-time.Second),
+		multiplier: quotaMultiplier{
+			BasePermille:  multiplierScale,
+			ExtraPermille: multiplierScale,
+		},
+		postStop: func() {
+			postStopCalls++
+		},
+		stopped: true,
+	}
+
+	snapshot, done := tracker.consumeTick(status, quotaRouteRegular, 3)
+	if !done {
+		t.Fatal("consumeTick() should stop tracking after the overdraft limit is exceeded")
+	}
+	if postStopCalls != 1 {
+		t.Fatalf("PostStop calls = %d, want 1", postStopCalls)
+	}
+	if snapshot.RegularUsedSeconds != 1200 {
+		t.Fatalf("RegularUsedSeconds = %d, want 1200", snapshot.RegularUsedSeconds)
+	}
+	if !tracker.stopPosted {
+		t.Fatal("stopPosted = false, want true")
+	}
+}
+
+func TestPendingStopIsTakenOnce(t *testing.T) {
+	tracker := &RuntimeTracker{
+		active:     true,
+		generation: 3,
+	}
+
+	if !tracker.requestStop(3) {
+		t.Fatal("requestStop() = false, want true")
+	}
+	if !tracker.takePendingStop() {
+		t.Fatal("first takePendingStop() = false, want true")
+	}
+	if tracker.takePendingStop() {
+		t.Fatal("second takePendingStop() = true, want false")
+	}
+}
+
+func TestRequestStopIgnoresStaleGeneration(t *testing.T) {
+	tracker := &RuntimeTracker{
+		active:     true,
+		generation: 4,
+	}
+
+	if tracker.requestStop(3) {
+		t.Fatal("requestStop() with stale generation = true, want false")
+	}
+	if tracker.takePendingStop() {
+		t.Fatal("takePendingStop() = true without a valid request")
 	}
 }
 
