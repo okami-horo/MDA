@@ -33,6 +33,7 @@
             "[JumpBack]RedDotClearRhythmGame",
             "[JumpBack]RedDotClearBlaBla",
             "[JumpBack]RedDotClearArcade",
+            "[JumpBack]RedDotClearCommandCenter",
             "CommonEndTask"
         ]
     },
@@ -56,7 +57,7 @@
                 0,
                 100,
                 200,
-                260
+                290
             ]
         }
     },
@@ -69,7 +70,7 @@
                     0,
                     100,
                     200,
-                    260
+                    290
                 ],
                 "expected": [
                     ".*查看.*" //查看更多
