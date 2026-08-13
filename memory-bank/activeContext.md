@@ -1,9 +1,12 @@
 # Active Context
 
 ## Current Focus
+
 Membership system refactored to bypass remote verification; local users now default to unlimited runtime.
 
 ## Recent Events
+
+- 2026-08-13: Merge `upstream/HEAD` / `upstream/main` updates up to `28cdcab` (v1.7.30) into `develop`: adapt new LargeEvent PERSONA ON FRONTLINE (Story 1 stage templates + `PersonaOnFrontline.json` pipeline + `LargeEvent.json` task options), add Command Center red-dot clearing (`RedDotClearCommandCenter.json` + `RedDotClear.json` entry), optimize Archives red-dot clearing flow and entry ROI, migrate StepUp gift-pack entry from `CashShop.json` into `RedDotClearCashShop.json`, and recompress many image templates. Clean merge with no conflicts; upstream changes do not touch membership, quota, or Go Agent code, so the unlimited membership bypass and local `QuickBattleAvailable.count=80` remain untouched.
 - 2026-08-09: Merge `upstream/HEAD` / `upstream/main` updates up to `19e227b` into `develop`: remove membership quota carried-debt mechanism (over-quota now force-stops immediately), fix Agent crash from calling `PostStop` inside the timer goroutine when quota is exhausted, adapt SmallEvent PROJECT MATIS Story 2 Hard stage (`ProjectMatisStory2StageHard.png` / `ProjectMatisStory2StageHardRepeatable.png`), and recompress related image templates. Resolve merge conflict in `agent/go-service/taskersink/membership/quota_test.go` by keeping the local unlimited-runtime malformed-state regression tests while adopting upstream's debt-removal test names. Preserve local membership bypass in `agent/go-service/taskersink/membership/memberdata.go`; local `QuickBattleAvailable.count=80` remains untouched.
 - 2026-08-06: Merge `upstream/HEAD` / `upstream/main` updates up to `954f93e` (v1.7.25) into `develop`: relax Event Challenge entry and Simulation Room overclock start OCR matching, and sync MaaFramework `interface` / `interface_config` schemas for the renamed Linux controller configuration. Clean merge with no conflicts; upstream changes do not touch membership, quota, or Go Agent code, so the unlimited membership bypass and local `QuickBattleAvailable.count=80` remain untouched.
 - 2026-07-31: Merge `upstream/HEAD` update `e436e9c` into `develop`: automated image template optimization recompressing SmallEvent PROJECT MATIS Story 2 normal-stage templates (`ProjectMatisStory2StageNormal.png`, `ProjectMatisStory2StageNormalRepeatable.png`). Clean merge with no conflicts; image-only change does not touch membership, quota, or battle pipelines, so the unlimited membership bypass and local `QuickBattleAvailable.count=80` remain untouched.
@@ -22,15 +25,18 @@ Membership system refactored to bypass remote verification; local users now defa
 - 2025-06-06: Initialize Memory Bank with 7 core files based on existing codebase analysis.
 
 ## Active Decisions
+
 - **No remote membership verification**: `checkMembership()` now short-circuits to a fixed `UnlimitedRuntime: true` status. Existing quota/refill/device-code code remains in repo but is effectively unreachable in normal flow.
 - **No quota-state dependency for unlimited users**: quota route checks and usage accounting return an unlimited snapshot before file locking or quota-state I/O, so malformed or unavailable quota files cannot stop local users.
 - **Membership bypass is non-negotiable**: Disabling remote membership verification is the primary purpose of this fork. Any upstream sync, merge, or refactor must preserve the bypass in `agent/go-service/taskersink/membership/memberdata.go`. If upstream changes threaten this, the local bypass wins.
 - **develop branch**: Active feature branch created from `main` for this refactor.
 
 ## Blockers
+
 - None.
 
 ## Next Steps
+
 1. Monitor future upstream quota changes for new call paths that could bypass the unlimited-user I/O short-circuits.
 2. If needed later, clean up unreachable code (device-code generation, HTTP fetch, refill logic, tests).
 3. Keep memory bank in sync with future feature additions or refactors.
