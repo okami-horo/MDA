@@ -493,5 +493,9 @@ tests/maatools
 # Local AI/code intelligence preferences
 .codegraph/
 .cursor/
+
 # CocoIndex Code (ccc)
 /.cocoindex_code/
+
+# DSH session artifacts
+.dsh-filess/
