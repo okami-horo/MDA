@@ -458,6 +458,10 @@ func routeSnapshotFromState(status *MembershipStatus, state quotaState, route qu
 }
 
 func GetQuotaSnapshot(status *MembershipStatus, pool quotaPool) (QuotaSnapshot, error) {
+	if status.UnlimitedRuntime {
+		snapshot := snapshotFromState(status, quotaState{Pools: map[string]quotaPoolState{}}, pool)
+		return snapshot, nil
+	}
 	quotaMu.Lock()
 	defer quotaMu.Unlock()
 	return quotaSnapshotLocked(status, pool, time.Now())
