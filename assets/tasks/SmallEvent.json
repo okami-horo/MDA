@@ -19,9 +19,14 @@
     "option": {
         "SmallEventTheme": {
             "type": "select",
-            "default_case": "GreatVillainUnion",
+            "default_case": "CurrentEvent",
             "label": "$option.SmallEventTheme.label",
             "cases": [
+                {
+                    "name": "CurrentEvent",
+                    "label": "$option.SmallEventTheme.CurrentEvent",
+                    "description": "$option.SmallEventTheme.CurrentEvent.description"
+                },
                 {
                     "name": "BitterSpice",
                     "label": "$option.SmallEventTheme.BitterSpice",
@@ -148,7 +153,8 @@
                             "recognition": {
                                 "param": {
                                     "template": [
-                                        "SmallEvent/GreatVillainUnion/GreatVillainUnionStory1Stage.png"
+                                        "SmallEvent/GreatVillainUnion/GreatVillainUnionStageNormal.png",
+                                        "SmallEvent/GreatVillainUnion/GreatVillainUnionStageHard.png"
                                     ]
                                 }
                             }
@@ -157,7 +163,8 @@
                             "recognition": {
                                 "param": {
                                     "template": [
-                                        "SmallEvent/GreatVillainUnion/GreatVillainUnionStory1StageRepeatable.png"
+                                        "SmallEvent/GreatVillainUnion/GreatVillainUnionStageNormalRepeatable.png",
+                                        "SmallEvent/GreatVillainUnion/GreatVillainUnionStageHardRepeatable.png"
                                     ]
                                 }
                             }
