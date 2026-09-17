@@ -28,9 +28,9 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    1191,
+                    1031,
                     10,
-                    16,
+                    249,
                     16
                 ],
                 "template": [
@@ -107,7 +107,7 @@
             ]
         },
         "next": [
-            "RedDotClearNoticenClickBlank"
+            "RedDotClearNoticeClickBlank"
         ]
     },
     "RedDotClearNoticeRedDotClickTop": {
@@ -141,7 +141,7 @@
             "RedDotClearNoticeScrollUp"
         ]
     },
-    "RedDotClearNoticenClickBlank": {
+    "RedDotClearNoticeClickBlank": {
         "desc": "公告点击空白",
         "action": {
             "type": "Click",

@@ -40,12 +40,12 @@ MDA includes a variety of tasks covering dailies, events, and utilities — all 
 
 ### Daily Tasks
 
-- 📅 **Daily Rewards**: Claim friend points, mail, missions, Pass and other daily rewards in one go.
+- 📅 **Daily Rewards**: Claim friendship points, mail, missions, Pass and other daily rewards in one go.
 - 🏠 **Outpost**: Claim defense rewards and complete dispatch board and brief encounter tasks.
 - 🛒 **Shop**: Buy what you need in the common, arena, and recycling shops.
 - 💎 **Cash Shop**: Enter the cash shop and claim free packages and other rewards.
 - 🧪 **Simulation Room**: Automatically complete normal / overclocked simulation room battles.
-- ⚔️ **Arena**: Battle in the rookie, special, and champion arenas and claim accumulated rewards.
+- ⚔️ **Arena**: Battle in the Rookie, SP, and Champion Arenas and claim accumulated rewards.
 - 🗼 **Tribe Tower**: Automatically challenge the tribe towers of each faction.
 - 🎯 **Interception**: Automatically challenge normal / anomaly interception battles and claim rewards.
 - 💬 **Advise**: Automatically advise Nikkes and claim bond and episode rewards.
@@ -64,6 +64,8 @@ MDA includes a variety of tasks covering dailies, events, and utilities — all 
 - 🔨 **Effect Reroll**: Automatically reroll effects on T10 equipment, with Character and Single modes.
 - 🗺️ **Auto Map Pushing**: Automatically click monsters to fight and trigger mechanisms to push through main stages.
 - 🔴 **Clear Red Dots**: Automatically clear red-dot notifications across supported interfaces.
+- 👥 **Friend Management**: Remove long-inactive friends and accept all friend requests.
+- 📊 **Quota Display**: Show today's used and remaining run quota; this task consumes no quota.
 
 ---
 

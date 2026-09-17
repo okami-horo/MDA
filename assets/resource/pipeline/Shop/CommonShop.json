@@ -7,7 +7,9 @@
             "[JumpBack]ShopPurchaseFlow",
             "[JumpBack]ShopPurchaseFreeGoods",
             "[JumpBack]ShopPurchaseCoreDustCase",
-            "[JumpBack]ShopClickFreeReset",
+            "[JumpBack]ShopPurchaseProfileCustomPack",
+            "[JumpBack]ShopPurchaseDarlingForADay",
+            "[JumpBack]ShopClickFreeRefresh",
             "CommonEndTask"
         ]
     },
@@ -20,7 +22,7 @@
                 "roi": [
                     0,
                     255,
-                    55,
+                    215,
                     390
                 ],
                 "template": [
@@ -45,7 +47,7 @@
                 "roi": [
                     68,
                     264,
-                    119,
+                    279,
                     20
                 ],
                 "expected": [
@@ -62,7 +64,7 @@
                 "roi": [
                     159,
                     351,
-                    26,
+                    186,
                     26
                 ],
                 "template": [
@@ -84,7 +86,7 @@
                 "roi": [
                     182,
                     352,
-                    217,
+                    377,
                     164
                 ],
                 "template": [
@@ -97,7 +99,53 @@
             "type": "Click"
         }
     },
-    "ShopClickFreeReset": {
+    "ShopPurchaseProfileCustomPack": {
+        "desc": "购买简介个性化礼包",
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    58,
+                    338,
+                    1222,
+                    325
+                ],
+                "template": [
+                    "Shop/CommonShop/ProfileCustomPack.png"
+                ],
+                "threshold": 0.9
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "ShopPurchaseDarlingForADay": {
+        "desc": "购买指挥官自由使用券",
+        "enabled": false,
+        "max_hit": 1,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    58,
+                    338,
+                    1222,
+                    325
+                ],
+                "template": [
+                    "Shop/Voucher/DarlingForADay.png"
+                ],
+                "threshold": 0.9
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "ShopClickFreeRefresh": {
         "desc": "免费刷新",
         "recognition": {
             "type": "TemplateMatch",
@@ -105,11 +153,11 @@
                 "roi": [
                     217,
                     304,
-                    56,
+                    216,
                     27
                 ],
                 "template": [
-                    "Shop/CommonShop/FreeReset.png"
+                    "Shop/CommonShop/FreeRefresh.png"
                 ]
             }
         },
@@ -125,11 +173,11 @@
             }
         },
         "next": [
-            "ShopConfirmReset",
-            "ShopClickFreeReset"
+            "ShopConfirmRefresh",
+            "ShopClickFreeRefresh"
         ]
     },
-    "ShopConfirmReset": {
+    "ShopConfirmRefresh": {
         "desc": "确认刷新",
         "recognition": {
             "type": "TemplateMatch",
@@ -151,7 +199,7 @@
         "post_wait_freezes": 1000
     },
     "ShopGemVisible": {
-        "desc": "宝珠可见",
+        "desc": "珠宝可见",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
