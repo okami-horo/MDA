@@ -25,7 +25,7 @@
 
 ## Current Status
 
-Stable, actively maintained. Remote membership verification disabled on `develop` branch; all users now run with unlimited runtime. **Preserving the membership bypass is the top priority for every future change, including upstream merges.** Memory bank initialized to improve cross-session agent context. Latest `upstream/HEAD` (up to `a86a47e`) has been merged into `develop` while preserving fork-specific bypass (`checkMembership` local unlimited), local `QuickBattleAvailable.count=80`, Memory Bank, and CI guards. The 2026-08-19 merge cherry-picked 7 upstream commits; the MapPushing member/non-member multiplier commit was taken partially (multiplier/runtime_tracker/action/locale only) to avoid restoring remote verification. Backup branch: `backup/develop-before-upstream-sync-2026-08-19`.
+Stable, actively maintained. Remote membership verification disabled on `develop` branch; all users now run with unlimited runtime. **Preserving the membership bypass is the top priority for every future change, including upstream merges.** As verified on 2026-10-07, `upstream/HEAD` is synchronized through `9fb9b48`, preserving the local unlimited membership status, quota-state I/O guards, and `QuickBattleAvailable.count=80`. The latest sync changes two recognition configurations and recompresses two templates; Go code is unchanged. Theme routing, JSONC parsing, template paths, PNG dimensions, and staged whitespace checks passed. Full Schema validation is unavailable without Python, and game validation remains pending. See [activeContext.md](activeContext.md) for sync details and earlier integration decisions.
 
 ## Known Issues
 
