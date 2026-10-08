@@ -335,5 +335,6 @@
     "option.EquipmentRerollValueTargets.invalid": "请输入 0～15 的整数",
     "option.EquipmentRerollValueTotalTargets.label": "角色最低总 T 档",
     "option.EquipmentRerollValueTotalTargets.description": "四件装备同名效果的 T 档总和（0 忽略，1～60 为目标）。总和达标即止；若目标超出当前词条上限（单件最高 T15）则停止。",
-    "option.EquipmentRerollValueTotalTargets.invalid": "请输入 0～60 的整数"
+    "option.EquipmentRerollValueTotalTargets.invalid": "请输入 0～60 的整数",
+    "option.SmallEventTheme.LittleWitchTrick": "LITTLE WITCH TRICK"
 }
