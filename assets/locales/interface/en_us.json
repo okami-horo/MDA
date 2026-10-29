@@ -130,7 +130,7 @@
     "option.EquipmentRerollMode.Character.label": "Character Reroll",
     "option.EquipmentRerollMode.Single.label": "Single Affix Reroll",
     "task.MapPushing.label": "🗺️Auto Map Pushing",
-    "task.MapPushing.description": "Must be selected separately. Click to start near monsters on the map; it will automatically click monsters for battle and trigger mechanisms\n**Advanced task: consumes runtime quota at 5x when using regular quota; special and event quota are charged at actual runtime**",
+    "task.MapPushing.description": "Must be selected separately. Click to start near monsters on the map; it will automatically click monsters for battle and trigger mechanisms\nIf no monsters remain or complex terrain is encountered, the task will get stuck and require manual intervention.\n**Advanced task: consumes runtime quota at 5x when using regular quota; special and event quota are charged at actual runtime**",
     "task.RedDotClear.label": "🔴Clear Red Dots",
     "task.RedDotClear.description": "Clear red dots across supported interfaces",
     "option.RedDotClearCashShop.label": "Clear Shop Red Dots",
@@ -337,5 +337,7 @@
     "option.EquipmentRerollValueTotalTargets.description": "Sum of matching effect tiers across four pieces (0 ignores, 1–60 target). Stops once the total reaches target, or if a target exceeds the attainable cap (max T15 per piece).",
     "option.EquipmentRerollValueTotalTargets.invalid": "Enter an integer from 0 to 60",
     "option.SmallEventTheme.LittleWitchTrick": "LITTLE WITCH TRICK",
-    "welcome.file": "locales/WELCOME.en_us.md"
+    "welcome.file": "locales/WELCOME.en_us.md",
+    "option.CashShopNetworkRetry.label": "Auto Retry on Network Error",
+    "option.CashShopNetworkRetry.description": "If a network error appears when entering the cash shop, click Retry once and wait up to 30 seconds. When disabled, leave the dialog untouched and let the task time out."
 }
