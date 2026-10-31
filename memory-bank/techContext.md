@@ -16,6 +16,7 @@
 ## Development Setup
 - **OS**: Windows 10/11
 - **Shell**: PowerShell 7
+- **Python validation (2026-10-31)**: Python 3.13.3, jsonschema 4.25.1 and referencing 0.37.0 are available on PATH. Full schema validation and all 40 scene-navigation replay checks pass; the replay uses `deps/bin/MaaFramework.dll` v5.13.1. Set `PYTHONIOENCODING=utf-8` when needed for terminal output.
 - **Go module location**: `agent\go-service\`
 - **Project-local Go**: Go 1.25.6 is installed under `.go\sdk\`; run `. .\.go\activate.ps1` before Go commands. `.go\`, `.cache\`, and `install\` are ignored local runtime directories.
 - **Initialize local runtime**: Run `python tools\setup_workspace.py` from the repository root. It builds the Go Agent, creates development directory junctions from `install\` to source assets, and downloads MaaFramework and MXU releases.
