@@ -197,8 +197,14 @@ func (p *affixOfflineProbe) checkAffixSafety(ctx *maa.Context, arg *maa.CustomRe
 		t.Error("unfiltered split percentage or partial-name percentage was accepted")
 	}
 	override(map[string]any{resultDetected: map[string]any{"recognition": map[string]any{"param": map[string]any{"expected": []string{".*"}}}}})
-	// 名称相同但两条路径给出不同百分比时，也不能进入结果取舍。
-	override(map[string]any{resultSlot: map[string]any{"recognition": map[string]any{"param": map[string]any{"replace": [][]string{{"23.56", "24.00"}}}}}})
+	// 一条路径无法落到官方档位时，采用另一条路径的合法数值。
+	override(map[string]any{resultSlot: map[string]any{"recognition": map[string]any{"param": map[string]any{"replace": [][]string{{`23\.56`, "24.00"}}}}}})
+	effects, values, raws, known = recognizeChangedEffects(ctx, img, partScan{}, false)
+	if !known || effects[0] != "优越代码伤害增加" || values[0] != "23.56%" {
+		t.Errorf("tier-reconciled result OCR: known=%v effects=%v values=%v raw=%v", known, effects, values, raws)
+	}
+	// 名称相同但两条路径落到不同官方档位时，仍不能进入结果取舍。
+	override(map[string]any{resultSlot: map[string]any{"recognition": map[string]any{"param": map[string]any{"replace": [][]string{{`23\.56`, "24.96"}}}}}})
 	if _, _, _, known := recognizeChangedEffects(ctx, img, partScan{}, false); known {
 		t.Error("conflicting result percentages were accepted")
 	}
