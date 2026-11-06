@@ -1,0 +1,5 @@
+[mcp_servers.nikke-control]
+enabled = false
+command = 'C:\Users\Administrator.DESKTOP-1KCKBJ1\AppData\Local\Microsoft\WinGet\Packages\astral-sh.uv_Microsoft.Winget.Source_8wekyb3d8bbwe\uv.exe'
+args = ['run', '--script', 'E:\Git\MDA\tools\nikke_mcp_launcher.py']
+startup_timeout_sec = 120

@@ -1,0 +1,152 @@
+{
+    "NikkeCampaignBattleProbe": {
+        "desc": "只读验证准备页，不执行战斗输入",
+        "timeout": 1000,
+        "next": [
+            "NikkeCampaignBattlePreparationObstructed",
+            "NikkeCampaignBattlePreparation"
+        ]
+    },
+    "NikkeCampaignBattlePreparationObstructed": {
+        "desc": "准备页背后的文字不构成接管依据，已知遮挡时不发送输入",
+        "recognition": {"type": "Or", "param": {"any_of": [
+                    "CommonGemCostNoticeVisible",
+                    "MultipleBattleDialogFlow",
+                    "CommonConfirmReward",
+                    "CommonConfirmAction",
+                    "CommonTouchToContinue",
+                    "BattleSettlementEscVisible",
+                    "BattleFailedVisible",
+                    "DialoguesMainVisible",
+                    "BattleFieldChanged"
+                ]}}
+    },
+    "NikkeCampaignBattlePreparation": {
+        "recognition": {"type": "And", "param": {"all_of": ["BattleMainVisible"]}}
+    },
+    "NikkeCampaignBattleEntry": {
+        "desc": "单次主线遭遇，保持当前编队",
+        "next": [
+            "CommonPurchaseGemBlocked",
+            "NikkeCampaignBattleMultipleBlocked",
+            "[JumpBack]BattleCloseModeInfo",
+            "BattleEnterQuickBattleFlow",
+            "BattleEnterNormalBattleFlow",
+            "NikkeCampaignBattleBlocked"
+        ]
+    },
+    "NikkeCampaignBattleMultipleBlocked": {
+        "desc": "多次战斗页交还，不点击 MAX 或进行战斗",
+        "recognition": {"type": "And", "param": {"all_of": ["MultipleBattleDialogFlow"]}},
+        "next": ["NikkeCampaignBattleBlocked"]
+    },
+    "NikkeCampaignBattleLost": {
+        "desc": "先记录明确战败，再处理返回",
+        "max_hit": 1,
+        "recognition": {"type": "And", "param": {"all_of": ["BattleFailedVisible"]}},
+        "next": ["NikkeCampaignBattleReturn"]
+    },
+    "NikkeCampaignBattleChapterTransition": {
+        "desc": "章节提示交还，不自动前往下一章",
+        "recognition": {"type": "And", "param": {"all_of": ["BattleFieldChanged"]}}
+    },
+    "NikkeCampaignBattleReturn": {
+        "desc": "只清理当前遭遇的结算和已知弹窗，未知页面有界交还",
+        "timeout": 20000,
+        "next": [
+            "CommonPurchaseGemBlocked",
+            "NikkeCampaignBattleMultipleBlocked",
+            "NikkeCampaignBattleChapterTransition",
+            "NikkeCampaignBattleLost",
+            "[JumpBack]NikkeCampaignBattleLeaveDefeat",
+            "[JumpBack]BattleConfirmOperationComplete",
+            "[JumpBack]DialoguesSkipStory",
+            "[JumpBack]CommonConfirmReward",
+            "[JumpBack]CommonConfirmAction",
+            "[JumpBack]CommonTouchToContinue",
+            "[JumpBack]NikkeCampaignBattleClosePreparation",
+            "NikkeCampaignBattleOverlayBlocked",
+            "NikkeCampaignBattleMapCheck"
+        ],
+        "on_error": ["NikkeCampaignBattleBlocked"]
+    },
+    "NikkeCampaignBattleLeaveDefeat": {
+        "max_hit": 1,
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "BattleFailedVisible",
+                    "CommonGoBack"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {"type": "Click"},
+        "post_wait_freezes": 500
+    },
+    "NikkeCampaignBattleClosePreparation": {
+        "max_hit": 1,
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "BattleMainVisible",
+                    "BattleClosePage"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {"type": "Click"},
+        "post_wait_freezes": 500
+    },
+    "NikkeCampaignBattleMapVisible": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "MapPushingMinimapVisible",
+                    "MapPushingOpenMinimap"
+                ]
+            }
+        }
+    },
+    "NikkeCampaignBattleOverlayBlocked": {
+        "desc": "在地图分支前拦截未处理的遮挡；复合识别引用不继承 inverse",
+        "recognition": {"type": "Or", "param": {"any_of": [
+                    "BattleMainVisible",
+                    "BattleFailedVisible",
+                    "BattleSettlementEscVisible",
+                    "BattleCombatHudVisible",
+                    "DialoguesMainVisible",
+                    "BattleFieldChanged",
+                    "MultipleBattleDialogFlow",
+                    "CommonConfirmAction",
+                    "CommonConfirmReward",
+                    "CommonTouchToContinue",
+                    "CommonClosePage",
+                    "CommonCloseSale",
+                    "CommonGemCostNoticeVisible"
+                ]}},
+        "next": ["NikkeCampaignBattleBlocked"]
+    },
+    "NikkeCampaignBattleMapReturned": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": ["NikkeCampaignBattleMapVisible"]
+            }
+        }
+    },
+    "NikkeCampaignBattleMapCheck": {
+        "desc": "先确认地图，再在同轮优先排除遮挡，最后确认交还",
+        "recognition": {"type": "And", "param": {"all_of": ["NikkeCampaignBattleMapVisible"]}},
+        "next": [
+            "NikkeCampaignBattleOverlayBlocked",
+            "NikkeCampaignBattleMapReturned"
+        ]
+    },
+    "NikkeCampaignBattleBlocked": {
+        "desc": "明确的受阻终点，不代表获胜或返回地图"
+    }
+}
