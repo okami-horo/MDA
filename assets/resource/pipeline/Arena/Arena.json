@@ -50,12 +50,11 @@
         "action": {
             "type": "Click"
         },
-        "post_wait_freezes": 500,
+        "post_wait_freezes": 2000,
         "next": [
             "[JumpBack]CommonConfirmReward",
             "[JumpBack]ArenaConfirmSpecialReward",
-            "CommonClosePage",
-            "CommonEndTask"
+            "CommonClosePage" // 必须关闭详情后返回父流程，直接结束会跳过竞技场入口
         ]
     },
     "ArenaConfirmSpecialReward": {

@@ -15,7 +15,7 @@
                     "CommonConfirmReward",
                     "CommonConfirmAction",
                     "CommonTouchToContinue",
-                    "BattleSettlementEscVisible",
+                    "BattleSettlementContinueVisible",
                     "BattleFailedVisible",
                     "DialoguesMainVisible",
                     "BattleFieldChanged"
@@ -116,7 +116,7 @@
         "recognition": {"type": "Or", "param": {"any_of": [
                     "BattleMainVisible",
                     "BattleFailedVisible",
-                    "BattleSettlementEscVisible",
+                    "BattleSettlementContinueVisible",
                     "BattleCombatHudVisible",
                     "DialoguesMainVisible",
                     "BattleFieldChanged",

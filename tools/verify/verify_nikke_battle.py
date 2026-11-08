@@ -104,7 +104,7 @@ class Replay:
             'QuickBattleVisible': {'preparation'} if self.scenario in {'quick', 'multiple'} else set(),
             'QuickBattleAvailable': {'preparation'} if self.scenario in {'quick', 'multiple'} else set(),
             'BattleDesktopCombatHudVisible': {'combat'},
-            'BattleSettlementEscVisible': {'result'},
+            'BattleSettlementContinueVisible': {'result'},
             'BattleFailedVisible': {'defeat'},
             'CommonGoBack': {'defeat'},
             'BattleClosePage': {'after_defeat'},
