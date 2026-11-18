@@ -8,9 +8,38 @@
             "group": [
                 "utility"
             ],
+            "option": [
+                "LuckyBoxOpeningUseRecruitmentItems"
+            ],
             "doc": [
                 "$task.LuckyBoxOpening.doc"
             ]
         }
-    ]
+    ],
+    "option": {
+        "LuckyBoxOpeningUseRecruitmentItems": {
+            "type": "switch",
+            "label": "$option.LuckyBoxOpeningUseRecruitmentItems.label",
+            "description": "$option.LuckyBoxOpeningUseRecruitmentItems.description",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "LuckyBoxOpeningUseRecruitmentItems": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "LuckyBoxOpeningUseRecruitmentItems": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        }
+    }
 }

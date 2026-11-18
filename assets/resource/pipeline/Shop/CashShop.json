@@ -9,7 +9,7 @@
         "next": [
             "CashShopResumeFlow",
             "HallEnterCashShop",
-            "[JumpBack]SceneEnterHall"
+            "[JumpBack]CashShopRecoverHall"
         ]
     },
     "CashShopResumeFlow": {
@@ -48,11 +48,36 @@
             "type": "Click"
         },
         "post_delay": 1500, // 点完先给商店请求留出返回时间，正常一次就进店，异常时也能等到网络异常弹窗再重试
+        "timeout": 30000, // 留足加载等待与 SceneEnterHall 清理弹窗后返回重试的时间预算
         "next": [
             "[JumpBack]CashShopConsumeLimitFlow", //日服进入付费商店会弹出消费限制弹窗，先处理再确认是否已进入商店
             "CashShopCornerFlow",
             "CashShopNetworkErrorFlow",
-            "HallEnterCashShop"
+            "HallEnterCashShop",
+            "[JumpBack]CommonConfirmReward", // 每日探索奖励弹窗覆盖屏幕时先点领取，免去等加载或完整回大厅的开销
+            "[JumpBack]CashShopWaitEntry",
+            "[JumpBack]CashShopRecoverHall"
+        ]
+    },
+    "CashShopWaitEntry": {
+        "desc": "等待商店加载画面",
+        "max_hit": 4, // 黑屏加载期大厅与商店均暂不可见，先轮询等待约 4 秒再回大厅，避免被 Home 退回
+        "pre_delay": 0,
+        "post_delay": 1000
+    },
+    "CashShopRecoverHall": {
+        "desc": "不在大厅时回大厅",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "CommonArkVisible"
+                ]
+            }
+        },
+        "inverse": true, // 已在大厅时不触发回大厅，防止入口缺失或点满次数后反复空转
+        "next": [
+            "SceneEnterHall"
         ]
     },
     "CashShopNetworkErrorVisible": {
@@ -89,6 +114,31 @@
             }
         }
     },
+    "CashShopLoadingSpinnerVisible": {
+        "desc": "右下角加载转圈可见",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    1188,
+                    633,
+                    68,
+                    63
+                ],
+                "lower": [
+                    220,
+                    220,
+                    220
+                ],
+                "upper": [
+                    255,
+                    255,
+                    255
+                ],
+                "count": 2000 // 加载转圈时白底方块实测 3539~3583 像素，无转圈时为 0
+            }
+        }
+    },
     "CashShopNetworkErrorFlow": {
         "desc": "网络异常后等页面",
         "recognition": {
@@ -109,7 +159,7 @@
     "CashShopRetryNetworkError": {
         "desc": "重试网络异常弹窗",
         "enabled": true, // 由选项 CashShopNetworkRetry 覆盖（默认 Yes），关掉后本节点整体不生效
-        "max_hit": 2, // 最多点两次「重新再试」，第二次只用于重试后再次弹窗的情况，不会无限重试
+        "max_hit": 2, // 最多点两次「重新再试」，第二次只用于本次重试结束后仍留弹窗或再次弹窗的情况
         "recognition": {
             "type": "And",
             "param": {
@@ -122,12 +172,30 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 1000, // 点完等弹窗散掉再判 next，免得第二次重试被浪费在正在淡出的弹窗上
+        "post_delay": 2000, // 点完留出拉起加载转圈或淡出弹窗的时间，避免刚点完就误判已结束并打光第二次重试
         "timeout": 60000,
         "next": [
-            "CashShopNetworkErrorFlow", //重试后又弹网络异常时再点一次，次数仍受 max_hit 限制
             "[JumpBack]CashShopConsumeLimitFlow",
-            "CashShopCornerFlow"
+            "CashShopCornerFlow",
+            "CashShopNetworkErrorRetrySettled"
+        ]
+    },
+    "CashShopNetworkErrorRetrySettled": {
+        "desc": "网络异常加载已结束",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "CashShopLoadingSpinnerVisible"
+                ]
+            }
+        },
+        "inverse": true, // 右下角加载转圈仍在时留在本轮 60s 超时内等待进店，避免转圈未停就连续耗尽两次重试
+        "timeout": 60000, // 弹窗已淡出但仍在加载商店页时同样保留 60s 等待预算
+        "next": [
+            "[JumpBack]CashShopConsumeLimitFlow",
+            "CashShopCornerFlow",
+            "CashShopNetworkErrorFlow" // 转圈已停（或弹窗重现）仍未进店时再回流触发第二次重试或收尾
         ]
     },
     "CashShopMainPageEntered": {
