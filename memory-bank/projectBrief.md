@@ -23,7 +23,7 @@ This repository is a fork of [1204244136/MDA](https://github.com/1204244136/MDA)
 - **PowerShell 7** for all terminal / build / dev commands.
 - Game UI language locked to Simplified Chinese for recognition accuracy.
 - ~~Daily runtime quota enforced by Go agent (free tier: 10 min/day, resets at 04:00).~~ **(Removed 2026-06-07)**: Remote membership verification bypassed; all local users default to unlimited runtime.
-- Interface localization limited to `zh_cn` and `en_us`.
+- Source interface locales are maintained in `zh_cn` and `en_us`; builds generate `zh_tw` from Simplified Chinese using `tools/generate_zh_tw.py` (merged 2026-11-06).
 
 ## Success Criteria
 - **Remote membership verification remains disabled in every build and every branch; `checkMembership()` must return local unlimited status.**

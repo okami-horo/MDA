@@ -7,10 +7,10 @@
 - 3 preset task combinations (`DailyFull`, `QuickDaily`, `SelfUse`).
 - Win32 controller support (Background, PrintWindow, ScreenDC) + ADB.
 - Go agent with custom sinks:
-  - `aspectratio` — display aspect ratio validation
-  - `hdrcheck` — Windows HDR state detection
-  - `processcheck` — NIKKE process validation
-  - `membership` — quota / device-code / refill logic (bypassed in this fork; local unlimited)
+    - `aspectratio` — display aspect ratio validation
+    - `hdrcheck` — Windows HDR state detection
+    - `processcheck` — NIKKE process validation
+    - `membership` — quota / device-code / refill logic (bypassed in this fork; local unlimited)
 - Localization for `zh_cn` and `en_us`.
 - Comprehensive pipeline naming conventions documented in `docs/pipeline-node-naming.md`.
 - Issue log analysis skill set up for debugging.
@@ -25,7 +25,7 @@
 
 ## Current Status
 
-Stable, actively maintained. Remote membership verification disabled on `develop` branch; all users now run with unlimited runtime. **Preserving the membership bypass is the top priority for every future change, including upstream merges.** As verified on 2026-11-08, `upstream/HEAD` is synchronized through `762d868` (v1.12.13), with battle, TribeTower, Arena and template fixes. The CLI follows the renamed settlement recognition node; quick-battle availability now uses upstream orange-background detection instead of the previous local white-pixel adjustment. Local unlimited membership/quota guards and the strict inline-comment guard remain intact. Schema, resource, formatting, theme and affected CLI/navigation checks pass; see [activeContext.md](activeContext.md) for validation details and outstanding runtime limitations. No Go files changed, so no rebuild was needed. Game validation remains pending.
+Stable, actively maintained. Remote membership verification disabled on `develop` branch; all users now run with unlimited runtime. **Preserving the membership bypass is the top priority for every future change, including upstream merges.** As verified on 2026-11-20, `develop` includes `upstream/HEAD` through `5726144` (merge `15d1655`). This sync adds SKY ON THE ROCK Normal, shared SmallEvent sweep routing, social-point recruitment, and Battle and RedDotClear fixes. Schema, resource and theme checks passed, including nine theme-routing and 63 scene-navigation groups offline. See [activeContext.md](activeContext.md) for the full validation scope. Live game validation remains pending.
 
 ## Known Issues
 
@@ -41,3 +41,4 @@ Stable, actively maintained. Remote membership verification disabled on `develop
 - **2026-06-07**: Remote membership verification bypassed entirely. `checkMembership()` short-circuits to local unlimited status. Quota enforcement code preserved in repo but no longer active.
 - **2026-07-11**: Runtime log `task_id=200000137` confirmed that quick-battle OCR succeeded, but `QuickBattleAvailable` detected 98 near-white pixels against a threshold of 100, causing fallback to normal battle. Lowered `assets/resource/pipeline/Battle/Battle.json` `QuickBattleAvailable.count` to 80 and passed Pipeline/Interface schema validation; real-game validation of both available and unavailable quick-battle states remains pending.
 - **2026-11-08**: Superseded the July white-pixel threshold adjustment with upstream HSV orange-background recognition. The new color target requires its calibrated threshold rather than carrying over the old value; current parameters and verification are recorded in [activeContext.md](activeContext.md).
+- **2026-11-18**: Extracted live NIKKE control and gameplay skills to [NikkeControl](../../NikkeControl/memory-bank/activeContext.md). MDA owns the production resources used by the external battle overlay.
